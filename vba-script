@@ -1,0 +1,105 @@
+Sub multiple_year_stock_data()
+
+    For Each ws In Worksheets
+    
+        Dim worksheet_name As String
+        Dim ticker_count As Long
+        Dim last_row As Long
+        Dim last_row2 As Long
+        Dim i As Long
+        Dim j As Long
+        Dim greatest_volume As Double
+        Dim ticker_greatest_volume As String
+        Dim percent_change As Double
+        Dim greatest_increase As Double
+        Dim ticker_greatest_increase As String
+        Dim greatest_decrease As Double
+        Dim ticker_greatest_decrease As String
+        
+        worksheet_name = ws.Name
+        
+        ws.Cells(1, 10).Value = "Ticker"
+        ws.Cells(1, 11).Value = "Yearly Change"
+        ws.Cells(1, 12).Value = "Percent Change"
+        ws.Cells(1, 13).Value = "Total Stock Volume"
+        
+        ticker_count = 2
+        j = 2
+        
+        last_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        
+        For i = 2 To last_row
+        
+            If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+            
+                ws.Cells(ticker_count, 10).Value = ws.Cells(i, 1).Value
+                ws.Cells(ticker_count, 11).Value = ws.Cells(i, 6).Value - ws.Cells(j, 3).Value
+                
+                If ws.Cells(ticker_count, 11).Value < 0 Then
+                    ws.Cells(ticker_count, 11).Interior.ColorIndex = 3
+                Else
+                    ws.Cells(ticker_count, 11).Interior.ColorIndex = 4
+                End If
+                
+                If ws.Cells(j, 3) <> 0 Then
+                    percent_change = (ws.Cells(i, 6) - ws.Cells(j, 3).Value) / ws.Cells(j, 3).Value
+                    ws.Cells(ticker_count, 12).Value = Format(percent_change, "Percent")
+                Else
+                    ws.Cells(ticker_count, 12).Value = Format(0, "Percent")
+                End If
+                
+                ws.Cells(ticker_count, 13).Value = WorksheetFunction.Sum(Range(ws.Cells(j, 7), ws.Cells(i, 7)))
+                
+                ticker_count = ticker_count + 1
+                j = i + 1
+            
+            End If
+            
+        Next i
+        
+        last_row2 = ws.Cells(Rows.Count, 10).End(xlUp).Row
+        greatest_increase = ws.Cells(2, 12).Value
+        ticker_greatest_increase = ws.Cells(2, 10).Value
+        greatest_decrease = ws.Cells(2, 12).Value
+        ticker_greatest_decrease = ws.Cells(2, 10).Value
+        greatest_volume = ws.Cells(2, 13).Value
+        ticker_greatest_volume = ws.Cells(2, 10).Value
+        
+        
+        For i = 2 To last_row2
+        
+            If ws.Cells(i, 12).Value > greatest_increase Then
+                greatest_increase = ws.Cells(i, 12).Value
+                ticker_greatest_increase = ws.Cells(i, 10).Value
+            End If
+            
+            If ws.Cells(i, 12).Value < greatest_decrease Then
+                greatest_decrease = ws.Cells(i, 12).Value
+                ticker_greatest_decrease = ws.Cells(i, 10).Value
+            End If
+            
+            If ws.Cells(i, 13).Value > greatest_volume Then
+                greatest_volume = ws.Cells(i, 13).Value
+                ticker_greatest_volume = ws.Cells(i, 10).Value
+            End If
+        
+        Next i
+        
+        ws.Cells(2, 17).Value = "Ticker"
+        ws.Cells(2, 18).Value = "Value"
+        
+        ws.Cells(3, 16).Value = "Greatest % Increase"
+        ws.Cells(3, 17).Value = ticker_greatest_increase
+        ws.Cells(3, 18).Value = Format(greatest_increase, "Percent")
+        
+        ws.Cells(4, 16).Value = "Greatest % Decrease"
+        ws.Cells(4, 17).Value = ticker_greatest_decrease
+        ws.Cells(4, 18).Value = Format(greatest_decrease, "Percent")
+        
+        ws.Cells(5, 16).Value = "Greatest Total Volume"
+        ws.Cells(5, 17).Value = ticker_greatest_volume
+        ws.Cells(5, 18).Value = greatest_volume
+        
+    Next ws
+
+End Sub
